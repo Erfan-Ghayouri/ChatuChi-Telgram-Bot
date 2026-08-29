@@ -17,42 +17,56 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         telegram_id = message.from_user.id
         
         # Check if user is in an active connection
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             return  # Not in a chat, ignore
         
         # Get the partner's Telegram ID
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
+        partner_telegram_id = partner["telegram_user_id"]
         
         # Relay the message
         try:
-            await relay_service.relay_message(client, telegram_id, partner_id, message)
+            success = await relay_service.relay_message(telegram_id, message)
+            if not success:
+                # End the connection on failure
+                await matchmaking_service.end_connection(telegram_id)
+                try:
+                    await client.send_message(
+                        partner_telegram_id,
+                        "⚠️ Your partner's connection was lost.",
+                        reply_markup=get_main_menu_keyboard()
+                    )
+                except Exception:
+                    pass
         except Exception as e:
             # Handle relay errors
             await message.reply(f"⚠️ Error sending message: {str(e)}")
             
             # End the connection on error
             await matchmaking_service.end_connection(telegram_id)
-            await client.send_message(
-                partner_id,
-                "⚠️ Your partner's connection was lost.",
-                reply_markup=get_main_menu_keyboard()
-            )
+            try:
+                await client.send_message(
+                    partner_telegram_id,
+                    "⚠️ Your partner's connection was lost.",
+                    reply_markup=get_main_menu_keyboard()
+                )
+            except Exception:
+                pass
     
     @app.on_message(filters.regex(r"^❌ End Chat$") & filters.private)
     async def handle_end_chat(client: Client, message: Message):
         """Handle end chat button."""
         telegram_id = message.from_user.id
         
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             await message.reply("❌ No active chat to end.")
             return
         
         # Get partner info
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
+        partner_telegram_id = partner["telegram_user_id"]
         
         # End the connection
         await matchmaking_service.end_connection(telegram_id)
@@ -65,7 +79,7 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         
         try:
             await client.send_message(
-                partner_id,
+                partner_telegram_id,
                 "🚪 Your partner ended the chat.\n\nWould you like to:",
                 reply_markup=get_end_chat_keyboard()
             )
@@ -77,20 +91,20 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         """Handle block request."""
         telegram_id = message.from_user.id
         
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             await message.reply("❌ No active chat.")
             return
         
         # Get partner info
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
+        partner_telegram_id = partner["telegram_user_id"]
         
         # Store blocked user ID in state for confirmation
         from bot.states.registration import RegistrationStates
         await RegistrationStates.set_state(telegram_id, {
             "step": "confirming_block",
-            "blocking_user_id": partner_id
+            "blocking_user_id": partner_telegram_id
         })
         
         await message.reply(
@@ -148,9 +162,9 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         await RegistrationStates.clear_state(telegram_id)
         
         # Check if in a chat
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if connection:
+        if partner:
             await message.reply(
                 "❌ Cancelled.",
                 reply_markup=get_connected_keyboard()
@@ -166,20 +180,20 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         """Handle report request."""
         telegram_id = message.from_user.id
         
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             await message.reply("❌ No active chat.")
             return
         
         # Get partner info
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
+        partner_telegram_id = partner["telegram_user_id"]
         
         # Store reported user ID in state
         from bot.states.registration import RegistrationStates
         await RegistrationStates.set_state(telegram_id, {
             "step": "selecting_report_reason",
-            "reporting_user_id": partner_id
+            "reporting_user_id": partner_telegram_id
         })
         
         from bot.keyboards.chat import get_report_keyboard
@@ -240,14 +254,14 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         """Handle like request."""
         telegram_id = message.from_user.id
         
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             await message.reply("❌ No active chat.")
             return
         
         # Get partner info
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
+        partner_telegram_id = partner["telegram_user_id"]
         
         # Send like
         from database.db import get_db
@@ -257,7 +271,7 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         likes_repo = LikesRepository(db)
         
         try:
-            await likes_repo.add_like(telegram_id, partner_id)
+            await likes_repo.add_like(telegram_id, partner_telegram_id)
             await message.reply("❤️ You liked this person!")
         except Exception as e:
             if "UNIQUE constraint" in str(e):
@@ -270,14 +284,11 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         """View partner's anonymous profile."""
         telegram_id = message.from_user.id
         
-        connection = await matchmaking_service.get_active_connection(telegram_id)
+        partner = await matchmaking_service.get_partner(telegram_id)
         
-        if not connection:
+        if not partner:
             await message.reply("❌ No active chat.")
             return
-        
-        # Get partner info
-        partner_id = connection["user_b"] if connection["user_a"] == telegram_id else connection["user_a"]
         
         # Get partner's profile service
         from bot.services.profile import ProfileService
@@ -286,18 +297,18 @@ def register_chat_handlers(app: Client, relay_service, matchmaking_service):
         db = get_db()
         profile_service = ProfileService(db)
         
-        partner = await profile_service.get_user(partner_id)
+        partner_data = await profile_service.get_user(partner["telegram_user_id"])
         
-        if partner:
+        if partner_data:
             from bot.texts import PROFILE_VIEW
             text = PROFILE_VIEW.format(
-                name=partner["name"],
-                age=partner["age"],
-                sex=partner["sex"],
-                city=partner.get("city", "Not specified"),
-                bio=partner.get("bio", "No bio"),
-                likes=partner.get("likes_received", 0),
-                public_id=partner["public_id"],
+                name=partner_data["name"],
+                age=partner_data["age"],
+                sex=partner_data["sex"],
+                city=partner_data.get("city", "Not specified"),
+                bio=partner_data.get("bio", "No bio"),
+                likes=partner_data.get("likes_received", 0),
+                public_id=partner_data["public_id"],
             )
             await message.reply(text)
         else:

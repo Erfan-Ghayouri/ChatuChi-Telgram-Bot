@@ -18,7 +18,7 @@ from bot.handlers.likes import register_likes_handlers
 from bot.handlers.moderation import register_moderation_handlers
 from bot.handlers.admin import register_admin_handlers
 from bot.services.matchmaking import MatchmakingService
-from bot.services.relay import MessageRelayService
+from bot.services.relay import RelayService
 from bot.services.wallet import WalletService
 from bot.services.referral import ReferralService
 from bot.services.moderation import ModerationService
@@ -58,7 +58,7 @@ async def main():
     # Initialize services
     logger.info("Initializing services...")
     matchmaking_service = MatchmakingService()
-    relay_service = MessageRelayService()
+    relay_service = RelayService()
     wallet_service = WalletService()
     referral_service = ReferralService()
     moderation_service = ModerationService()
