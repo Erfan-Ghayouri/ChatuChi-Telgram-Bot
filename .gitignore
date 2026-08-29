@@ -1,51 +1,5 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Environment
-.env
-.env.local
-*.env.*
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Temp files
-*.tmp
-
-# Coverage
-.coverage
-coverage/
-htmlcov/
-
-# Database
-*.sqlite
-*.db
-
-# Migration backups
-chatuchi/database/migrations/*.bak
-chatuchi/database/migrations/*.backup
+```
+# SQLite WAL mode files
+chatuchi/data/chatuchi.db-shm
+chatuchi/data/chatuchi.db-wal
+```

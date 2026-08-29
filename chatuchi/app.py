@@ -55,14 +55,18 @@ async def main():
     logger.info("Initializing database...")
     await init_db()
     
+    # Get database instance for services
+    from database.db import get_db
+    db_instance = get_db()
+    
     # Initialize services
     logger.info("Initializing services...")
-    matchmaking_service = MatchmakingService()
-    relay_service = RelayService()
-    wallet_service = WalletService()
-    referral_service = ReferralService()
-    moderation_service = ModerationService()
-    profile_service = ProfileService()
+    matchmaking_service = MatchmakingService(db_instance)
+    relay_service = RelayService(None, db_instance)  # Client will be set later
+    wallet_service = WalletService(db_instance)
+    referral_service = ReferralService(db_instance)
+    moderation_service = ModerationService(db_instance)
+    profile_service = ProfileService(db_instance)
     
     # Initialize bot client
     logger.info("Starting ChatuChi bot...")
@@ -72,6 +76,9 @@ async def main():
         api_hash=config.API_HASH,
         bot_token=config.BOT_TOKEN
     )
+    
+    # Set client for relay service
+    relay_service.client = app
     
     # Register handlers
     register_start_handlers(app, profile_service)
