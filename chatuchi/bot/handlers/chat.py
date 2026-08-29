@@ -11,7 +11,8 @@ from bot.keyboards.chat import get_connected_keyboard, get_end_chat_keyboard
 def register_chat_handlers(app: Client, relay_service, matchmaking_service):
     """Register chat message handlers."""
     
-    @app.on_message(filters.private & ~filters.command())
+    # Filter for private messages that are NOT commands
+    @app.on_message(filters.private & ~filters.regex(r"^/"))
     async def handle_private_message(client: Client, message: Message):
         """Handle private messages - relay if in active chat."""
         telegram_id = message.from_user.id
