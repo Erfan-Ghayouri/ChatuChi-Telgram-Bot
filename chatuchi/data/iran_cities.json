@@ -1,0 +1,225 @@
+{
+  "Tehran": [
+    "Tehran",
+    "Shemiranat",
+    "Rey",
+    "Tajrish",
+    "Lavasan",
+    "Fasham"
+  ],
+  "Isfahan": [
+    "Isfahan",
+    "Kashan",
+    "Najafabad",
+    "Khomeynishahr",
+    "Shahinshahr",
+    "Mobarakheh"
+  ],
+  "Fars": [
+    "Shiraz",
+    "Marvdasht",
+    "Jahrom",
+    "Fasa",
+    "Kazerun",
+    "Lar"
+  ],
+  "Razavi Khorasan": [
+    "Mashhad",
+    "Neyshabur",
+    "Sabzevar",
+    "Torbat-e Heydarieh",
+    "Kashmar",
+    "Chenaran"
+  ],
+  "East Azerbaijan": [
+    "Tabriz",
+    "Maragheh",
+    "Urmia",
+    "Ardabil",
+    "Bonab",
+    "Mianeh"
+  ],
+  "Khuzestan": [
+    "Ahvaz",
+    "Abadan",
+    "Khorramshahr",
+    "Dezful",
+    "Andimeshk",
+    "Shushtar"
+  ],
+  "Mazandaran": [
+    "Sari",
+    "Babol",
+    "Amol",
+    "Qaem Shahr",
+    "Ramsar",
+    "Tonekabon"
+  ],
+  "Gilan": [
+    "Rasht",
+    "Bandar-e Anzali",
+    "Lahijan",
+    "Astara",
+    "Someh Sara",
+    "Roudsar"
+  ],
+  "Yazd": [
+    "Yazd",
+    "Ardakan",
+    "Meybod",
+    "Bafq",
+    "Taft"
+  ],
+  "Kerman": [
+    "Kerman",
+    "Rafsanjan",
+    "Sirjan",
+    "Bam",
+    "Jiroft",
+    "Mahallat"
+  ],
+  "Hormozgan": [
+    "Bandar Abbas",
+    "Minab",
+    "Rudan",
+    "Jask",
+    "Parsian"
+  ],
+  "Bushehr": [
+    "Bushehr",
+    "Borazjan",
+    "Kangan",
+    "Dashtestan",
+    "Dashti"
+  ],
+  "Qom": [
+    "Qom",
+    "Salafchegan"
+  ],
+  "Markazi": [
+    "Arak",
+    "Saveh",
+    "Khomeyn",
+    "Mahallat",
+    "Delijan"
+  ],
+  "Hamadan": [
+    "Hamadan",
+    "Malayer",
+    "Nahavand",
+    "Asadabad",
+    "Bahar"
+  ],
+  "Kermanshah": [
+    "Kermanshah",
+    "Islamabad-e Gharb",
+    "Kangavar",
+    "Sarpol-e Zahab",
+    "Harsin"
+  ],
+  "Lorestan": [
+    "Khorramabad",
+    "Borujerd",
+    "Dorud",
+    "Aligudarz",
+    "Kuhdasht"
+  ],
+  "Kurdistan": [
+    "Sanandaj",
+    "Marivan",
+    "Saqqez",
+    "Baneh",
+    "Qorveh"
+  ],
+  "West Azerbaijan": [
+    "Urmia",
+    "Bukan",
+    "Mahabad",
+    "Piranshahr",
+    "Showt"
+  ],
+  "Ardabil": [
+    "Ardabil",
+    "Meshgin Shahr",
+    "Parsabad",
+    "Khalkhal",
+    "Germi"
+  ],
+  "Zanjan": [
+    "Zanjan",
+    "Abhar",
+    "Khodabandeh",
+    "Mahneshan",
+    "Tarom"
+  ],
+  "Qazvin": [
+    "Qazvin",
+    "Takestan",
+    "Buin Zahra",
+    "Abyek",
+    "Alborz"
+  ],
+  "Golestan": [
+    "Gorgan",
+    "Gonbad-e Kavus",
+    "Bandar Turkaman",
+    "Aliabad",
+    "Aqqala"
+  ],
+  "North Khorasan": [
+    "Bojnord",
+    "Quchan",
+    "Shirvan",
+    "Esfarayen",
+    "Maneh"
+  ],
+  "South Khorasan": [
+    "Birjand",
+    "Ghaenat",
+    "Ferdows",
+    "Tabas",
+    "Nehbandan"
+  ],
+  "Sistan and Baluchestan": [
+    "Zahedan",
+    "Zabol",
+    "Iranshahr",
+    "Chabahar",
+    "Konarak"
+  ],
+  "Semnan": [
+    "Semnan",
+    "Shahrud",
+    "Damghan",
+    "Garmsar",
+    "Ayvandkey"
+  ],
+  "Alborz": [
+    "Karaj",
+    "Nazarabad",
+    "Savojbolagh",
+    "Taleghan",
+    "Eshtehard"
+  ],
+  "Chaharmahal and Bakhtiari": [
+    "Shahrekord",
+    "Borujen",
+    "Farrokhshahr",
+    "Lordegan",
+    "Ardal"
+  ],
+  "Kohgiluyeh and Boyer-Ahmad": [
+    "Yasuj",
+    "Dogonbadan",
+    "Gachsaran",
+    "Bahmai",
+    "Charam"
+  ],
+  "Ilam": [
+    "Ilam",
+    "Dehloran",
+    "Eyvan",
+    "Mehran",
+    "Darreh Shahr"
+  ]
+}
