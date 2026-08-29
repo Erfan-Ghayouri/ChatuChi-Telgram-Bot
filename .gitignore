@@ -1,5 +1,1 @@
-```
-# SQLite WAL mode files
-chatuchi/data/chatuchi.db-shm
-chatuchi/data/chatuchi.db-wal
-```
+Nothing should be ignored based on the provided file changes. The only modified file is a Python source file (`chatuchi/bot/handlers/chat.py`), which should not be added to .gitignore.
