@@ -119,11 +119,11 @@ def register_start_handlers(app: Client, profile_service):
             state["step"] = "asking_sex"
             await RegistrationStates.set_state(telegram_id, state)
             
-            from bot.keyboards.main import get_gender_keyboard
+            from bot.keyboards.registration import get_gender_keyboard
             keyboard = get_gender_keyboard()
             
             await message.reply(
-                "⚤ What is your sex?",
+                "⚤ جنسیت خود را انتخاب کنید:",
                 reply_markup=keyboard
             )
         
@@ -132,16 +132,19 @@ def register_start_handlers(app: Client, profile_service):
             
             # Map button text to sex value
             sex_mapping = {
-                "👨 Male": "Male",
+                "👨 مرد": "Male",
+                "مرد": "Male",
                 "Male": "Male",
-                "👩 Female": "Female",
+                "👩 زن": "Female",
+                "زن": "Female",
                 "Female": "Female",
-                "🌐 Other": "Other",
+                "🌐 سایر": "Other",
+                "سایر": "Other",
                 "Other": "Other",
             }
             
             if sex_text not in sex_mapping:
-                await message.reply("Please select one of the options below.")
+                await message.reply("لطفاً یکی از گزینه‌های زیر را انتخاب کنید.")
                 return
             
             sex = sex_mapping[sex_text]
@@ -149,11 +152,11 @@ def register_start_handlers(app: Client, profile_service):
             state["step"] = "asking_province"
             await RegistrationStates.set_state(telegram_id, state)
             
-            from bot.keyboards.main import get_province_keyboard
+            from bot.keyboards.registration import get_province_keyboard
             keyboard = get_province_keyboard()
             
             await message.reply(
-                "🏙️ Select your province:",
+                "🏙️ استان خود را انتخاب کنید:",
                 reply_markup=keyboard
             )
         
@@ -171,19 +174,43 @@ def register_start_handlers(app: Client, profile_service):
             state["step"] = "asking_city"
             await RegistrationStates.set_state(telegram_id, state)
             
-            from bot.keyboards.main import get_city_keyboard
+            from bot.keyboards.registration import get_city_keyboard
             keyboard = get_city_keyboard(province)
             
             await message.reply(
-                f"🏙️ Select your city in {province}:",
+                f"🏙️ شهر خود را در استان {province} انتخاب کنید:",
                 reply_markup=keyboard
             )
         
         elif step == "asking_city":
             city = message.text.strip()
             
+            # Handle pagination
+            if city == "صفحه بعد ▶️" or city == "◀️ صفحه قبل":
+                from bot.keyboards.main import get_city_keyboard
+                current_page = state.get("city_page", 0)
+                
+                if city == "صفحه بعد ▶️":
+                    current_page += 1
+                else:
+                    current_page = max(0, current_page - 1)
+                
+                state["city_page"] = current_page
+                await RegistrationStates.set_state(telegram_id, state)
+                
+                from bot.utils.helpers import load_cities_data
+                cities_data = load_cities_data()
+                province_cities = cities_data.get(province, [])
+                
+                keyboard = get_city_keyboard(province, province_cities, current_page)
+                await message.reply(
+                    f"🏙️ شهر خود را در استان {province} انتخاب کنید:\n(صفحه {current_page + 1})",
+                    reply_markup=keyboard
+                )
+                return
+            
             # Handle back button
-            if city == "◀️ Back to Provinces":
+            if city == "◀️ بازگشت به استان‌ها":
                 state["step"] = "asking_province"
                 await RegistrationStates.set_state(telegram_id, state)
                 
@@ -191,7 +218,7 @@ def register_start_handlers(app: Client, profile_service):
                 keyboard = get_province_keyboard()
                 
                 await message.reply(
-                    "🏙️ Select your province:",
+                    "🏙️ استان خود را انتخاب کنید:",
                     reply_markup=keyboard
                 )
                 return
@@ -204,7 +231,7 @@ def register_start_handlers(app: Client, profile_service):
             province_cities = cities_data.get(province, [])
             
             if city not in province_cities:
-                await message.reply("Please select a valid city from the list.")
+                await message.reply("لطفاً یک شهر معتبر از لیست زیر انتخاب کنید.")
                 return
             
             state["city"] = city
@@ -212,9 +239,9 @@ def register_start_handlers(app: Client, profile_service):
             await RegistrationStates.set_state(telegram_id, state)
             
             await message.reply(
-                "📝 Write a short bio about yourself:\n\n"
-                "This will be shown to other users. Keep it friendly and appropriate!\n\n"
-                "Send 'Skip' to skip this step."
+                "📝 یک بیوگرافی کوتاه درباره خود بنویسید:\n\n"
+                "این متن به سایر کاربران نمایش داده می‌شود. دوستانه و مناسب باشد!\n\n"
+                "برای رد کردن این مرحله 'رد کردن' را ارسال کنید."
             )
         
         elif step == "asking_bio":
