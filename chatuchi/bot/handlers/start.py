@@ -128,13 +128,25 @@ def register_start_handlers(app: Client, profile_service):
             )
         
         elif step == "asking_sex":
-            sex = message.text.strip()
-            if sex not in ["Male", "Female", "Other"]:
+            sex_text = message.text.strip()
+            
+            # Map button text to sex value
+            sex_mapping = {
+                "👨 Male": "Male",
+                "Male": "Male",
+                "👩 Female": "Female",
+                "Female": "Female",
+                "🌐 Other": "Other",
+                "Other": "Other",
+            }
+            
+            if sex_text not in sex_mapping:
                 await message.reply("Please select one of the options below.")
                 return
             
+            sex = sex_mapping[sex_text]
             state["sex"] = sex
-            state["step"] = "asking_city"
+            state["step"] = "asking_province"
             await RegistrationStates.set_state(telegram_id, state)
             
             from bot.keyboards.main import get_province_keyboard
@@ -147,6 +159,7 @@ def register_start_handlers(app: Client, profile_service):
         
         elif step == "asking_province":
             province = message.text.strip()
+            
             from bot.utils.helpers import load_cities_data
             cities_data = load_cities_data()
             
@@ -158,6 +171,7 @@ def register_start_handlers(app: Client, profile_service):
             state["step"] = "asking_city"
             await RegistrationStates.set_state(telegram_id, state)
             
+            from bot.keyboards.main import get_city_keyboard
             keyboard = get_city_keyboard(province)
             
             await message.reply(
@@ -167,6 +181,32 @@ def register_start_handlers(app: Client, profile_service):
         
         elif step == "asking_city":
             city = message.text.strip()
+            
+            # Handle back button
+            if city == "◀️ Back to Provinces":
+                state["step"] = "asking_province"
+                await RegistrationStates.set_state(telegram_id, state)
+                
+                from bot.keyboards.main import get_province_keyboard
+                keyboard = get_province_keyboard()
+                
+                await message.reply(
+                    "🏙️ Select your province:",
+                    reply_markup=keyboard
+                )
+                return
+            
+            from bot.utils.helpers import load_cities_data
+            cities_data = load_cities_data()
+            
+            # Validate city is in the selected province
+            province = state.get("province")
+            province_cities = cities_data.get(province, [])
+            
+            if city not in province_cities:
+                await message.reply("Please select a valid city from the list.")
+                return
+            
             state["city"] = city
             state["step"] = "asking_bio"
             await RegistrationStates.set_state(telegram_id, state)
@@ -253,7 +293,7 @@ def get_city_keyboard(province: str):
     
     buttons.append(["◀️ Back to Provinces"])
     
-    return ReplyKeyboardMarkup(buttons, resize_keyboard=True)
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
 
 
 def get_province_keyboard():
