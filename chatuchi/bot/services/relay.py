@@ -10,7 +10,7 @@ from typing import Optional
 
 from pyrogram import Client
 from pyrogram.types import Message
-from pyrogram.enums import ParseMode, MessageType
+from pyrogram.enums import ParseMode
 
 from database.db import Database
 from database.repositories.users import UserRepository

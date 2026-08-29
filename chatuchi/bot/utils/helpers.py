@@ -141,3 +141,22 @@ async def async_lock(lock: asyncio.Lock):
         yield
     finally:
         lock.release()
+
+
+def load_cities_data() -> dict:
+    """Load Iran cities data from JSON file."""
+    import json
+    from pathlib import Path
+    
+    cities_file = Path(__file__).parent.parent.parent / "data" / "iran_cities.json"
+    
+    if not cities_file.exists():
+        # Return minimal fallback data
+        return {
+            "Tehran": ["Tehran"],
+            "Isfahan": ["Isfahan"],
+            "Fars": ["Shiraz"],
+        }
+    
+    with open(cities_file, "r", encoding="utf-8") as f:
+        return json.load(f)

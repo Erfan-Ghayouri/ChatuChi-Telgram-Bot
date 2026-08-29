@@ -70,3 +70,40 @@ def skip_back_keyboard() -> ReplyKeyboardMarkup:
         [KeyboardButton(SKIP_BUTTON), KeyboardButton(BACK_BUTTON)],
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+
+def get_start_keyboard():
+    """Get start menu keyboard (deprecated, use welcome_keyboard)."""
+    return welcome_keyboard()
+
+
+def get_main_menu_keyboard():
+    """Get main menu keyboard."""
+    return main_keyboard()
+
+
+def get_gender_keyboard():
+    """Get gender selection keyboard."""
+    keyboard = [
+        ["👨 Male"],
+        ["👩 Female"],
+        ["🌐 Other"],
+    ]
+    return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+
+
+def get_province_keyboard():
+    """Get province selection keyboard."""
+    from bot.utils.helpers import load_cities_data
+    cities_data = load_cities_data()
+    
+    provinces = sorted(cities_data.keys())[:20]  # Limit to first 20 for usability
+    buttons = []
+    
+    for i in range(0, len(provinces), 2):
+        row = [provinces[i]]
+        if i + 1 < len(provinces):
+            row.append(provinces[i + 1])
+        buttons.append(row)
+    
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
