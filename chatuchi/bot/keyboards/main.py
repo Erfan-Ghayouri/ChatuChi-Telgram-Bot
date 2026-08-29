@@ -85,9 +85,9 @@ def get_main_menu_keyboard():
 def get_gender_keyboard():
     """Get gender selection keyboard."""
     keyboard = [
-        ["👨 Male"],
-        ["👩 Female"],
-        ["🌐 Other"],
+        ["👨 مرد"],
+        ["👩 زن"],
+        ["🌐 سایر"],
     ]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
 
@@ -97,7 +97,7 @@ def get_province_keyboard():
     from bot.utils.helpers import load_cities_data
     cities_data = load_cities_data()
     
-    provinces = sorted(cities_data.keys())[:20]  # Limit to first 20 for usability
+    provinces = sorted(cities_data.keys())
     buttons = []
     
     for i in range(0, len(provinces), 2):
@@ -105,5 +105,47 @@ def get_province_keyboard():
         if i + 1 < len(provinces):
             row.append(provinces[i + 1])
         buttons.append(row)
+    
+    # Add back button for navigation
+    buttons.append(["◀️ بازگشت به جنسیت"])
+    
+    return ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
+
+
+def get_city_keyboard(province: str, cities: list = None, page: int = 0):
+    """Get city selection keyboard for a specific province."""
+    from bot.utils.helpers import load_cities_data
+    
+    if cities is None:
+        cities_data = load_cities_data()
+        cities = cities_data.get(province, [])
+    
+    # Paginate cities (10 per page)
+    page_size = 10
+    total_pages = (len(cities) + page_size - 1) // page_size
+    start_idx = page * page_size
+    end_idx = min(start_idx + page_size, len(cities))
+    
+    page_cities = cities[start_idx:end_idx]
+    
+    buttons = []
+    for i in range(0, len(page_cities), 2):
+        row = [page_cities[i]]
+        if i + 1 < len(page_cities):
+            row.append(page_cities[i + 1])
+        buttons.append(row)
+    
+    # Add pagination controls
+    nav_row = []
+    if page > 0:
+        nav_row.append("◀️ صفحه قبل")
+    if page < total_pages - 1:
+        nav_row.append("صفحه بعد ▶️")
+    
+    if nav_row:
+        buttons.append(nav_row)
+    
+    # Add back button
+    buttons.append(["◀️ بازگشت به استان‌ها"])
     
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
