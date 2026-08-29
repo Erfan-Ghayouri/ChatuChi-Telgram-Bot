@@ -6,7 +6,7 @@ import asyncio
 import logging
 import os
 from pyrogram import Client
-from config import Config
+import config
 from database.db import init_db, cleanup_stale_entries
 from bot.handlers.start import register_start_handlers
 from bot.handlers.profile import register_profile_handlers
@@ -49,7 +49,7 @@ async def main():
     os.makedirs('data', exist_ok=True)
     
     # Validate configuration
-    Config.validate()
+    config.validate_config()
     
     # Initialize database
     logger.info("Initializing database...")
@@ -68,9 +68,9 @@ async def main():
     logger.info("Starting ChatuChi bot...")
     app = Client(
         "chatuchi_bot",
-        api_id=Config.API_ID,
-        api_hash=Config.API_HASH,
-        bot_token=Config.BOT_TOKEN
+        api_id=config.API_ID,
+        api_hash=config.API_HASH,
+        bot_token=config.BOT_TOKEN
     )
     
     # Register handlers

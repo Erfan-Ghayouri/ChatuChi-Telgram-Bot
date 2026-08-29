@@ -99,3 +99,34 @@ async def init_database(db_path: str) -> Database:
     db = Database(db_path)
     await db.connect()
     return db
+
+
+async def init_db():
+    """Initialize database and run migrations."""
+    from config import DATABASE_PATH
+    from database.migrations import run_migrations
+    
+    db_instance = await init_database(DATABASE_PATH)
+    await run_migrations(db_instance)
+
+
+async def cleanup_stale_entries():
+    """Clean up stale queue entries and connections."""
+    import time
+    from config import QUEUE_STALE_TIMEOUT, CONNECTION_STALE_TIMEOUT
+    from database.db import get_db
+    
+    db = get_db()
+    current_time = time.time()
+    
+    # Clean up stale queue entries
+    await db.execute(
+        "DELETE FROM queue WHERE joined_at < datetime('now', ?)",
+        (f"-{QUEUE_STALE_TIMEOUT} seconds",)
+    )
+    
+    # Clean up stale connections
+    await db.execute(
+        "UPDATE connections SET active = 0, ended_at = CURRENT_TIMESTAMP WHERE active = 1 AND started_at < datetime('now', ?)",
+        (f"-{CONNECTION_STALE_TIMEOUT} seconds",)
+    )

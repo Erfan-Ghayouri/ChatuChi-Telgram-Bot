@@ -161,6 +161,15 @@ MIGRATIONS = [
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     """,
+    
+    # Migration 10: Registration states table
+    """
+    CREATE TABLE IF NOT EXISTS registration_states (
+        telegram_id INTEGER PRIMARY KEY,
+        state_data TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """,
 ]
 
 
